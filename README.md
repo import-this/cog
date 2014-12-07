@@ -1,4 +1,4 @@
-cog
+Cog
 ===
 
 A tiny 2D HTML5 Game JavaScript Library
