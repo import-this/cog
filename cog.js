@@ -768,36 +768,33 @@ function UserInputDaemon() {
  * (This behavior is the same as EventTarget.addEventListener).
  *
  * @param {string} events - One or more space-separated event types.
- * @param {function(Event, [*])} callback - The handler to register
+ * @param {function(Event, [*])} handler - The handler to register
  *      for the event.
- *      The handler will be called when the event fires as follows:
+ *      The handler will be called when the event is triggered as follows:
  *           function(Event event [, * extraParameter ] [, ... ] )
- * @param {Element} [target] - The object to attach the handler to.
+ *      The extra parameters can be passed with the {@link trigger} method.
  * @return {cog.UserInputDaemon} this
  */
-UserInputDaemon.prototype.on = function(events, callback, target) {
-    var i, len, event, callbacklist;
+UserInputDaemon.prototype.on = function(events, handler) {
+    var i, len, event, list;
 
     events = events.split(' ');
     for (i = 0, len = events.length; i < len; ++i) {
         event = events[i];
-        callbacklist = this.events[event];
+        list = this.events[event];
 
         try {
-            if (callbacklist.indexOf(callback) >= 0) {
-                callbacklist.push(callback);
+            if (list.indexOf(handler) >= 0) {
+                list.push(handler);
             }
         } catch (ex) {
             switch (ex.name) {
-            case 'TypeError':   // No callback list yet.
-                this.events[event] = [callback];
+            case 'TypeError':   // No handler list yet.
+                this.events[event] = [handler];
                 break;
             default:
                 throw new Error('Assertion failed');
             }
-        }
-        if (target) {
-            target.addEventListener(event, callback, false);
         }
     }
     return this;
@@ -807,25 +804,21 @@ UserInputDaemon.prototype.on = function(events, callback, target) {
  * Removes an event handler.
  *
  * @param {string} events - One or more space-separated event types.
- * @param {function} [callback] - The handler (previously attached) to remove.
+ * @param {function} [handler] - The handler (previously attached) to remove.
  *      If a handler is not specified, then all events handlers of that type
  *      are removed.
- * @param {Element} [target] - The object that the handler is attached to.
  * @return {cog.UserInputDaemon} this
  */
-UserInputDaemon.prototype.off = function(events, callback, target) {
-    var i, len, event, callbacklist;
+UserInputDaemon.prototype.off = function(events, handler) {
+    var i, len, event, list;
 
     events = events.split(' ');
     for (i = 0, len = events.length; i < len; ++i) {
         event = events[i];
 
-        if (callback) {
-            callbacklist = this.events[event];
-            callbacklist.splice(callbacklist.indexOf(callback), 1);
-            if (target) {
-                target.removeEventListener(event, callback, false);
-            }
+        if (handler) {
+            list = this.events[event];
+            list.splice(list.indexOf(handler), 1);
         } else {
             delete this.events[event];
         }
@@ -840,15 +833,14 @@ UserInputDaemon.prototype.off = function(events, callback, target) {
  * @param {string} event - The event type.
  * @param {Array} [data] - Additional parameters to pass along to
  *      the event handler.
- * @param {Element} [target] - The object that the handler is attached to.
  * @return {cog.UserInputDaemon} this
  */
-UserInputDaemon.prototype.trigger = function(event, data, target) {
-    var i, len, callbacklist = this.events[event];
+UserInputDaemon.prototype.trigger = function(event, data) {
+    var i, len, list = this.events[event];
 
-    if (callbacklist) {
-        for (i = 0, len = callbacklist.length; i < len; ++i) {
-            callbacklist[i].apply(target, data);
+    if (list) {
+        for (i = 0, len = list.length; i < len; ++i) {
+            list[i].apply(null, data);
         }
     }
     return this;
