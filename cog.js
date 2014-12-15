@@ -50,6 +50,7 @@
  *      log
  *  Utilities:
  *      noConflict
+ *      noop
  *
  * The code follows the conventions of Google JavaScript Style Guide,
  *      with some alterations. The style guide is described in depth here:
@@ -91,31 +92,40 @@ if (oldcog) {
     }
 }
 
-/********************************* Logging ***********************************/
+function noop() {}
 
+function returnFalse() {
+    return false;
+}
+
+/********************************** Logging ***********************************/
+
+/** @const */
 cog.log = (function() {
     var console = global.console;
 
     if (console && console.log) {
         return console.log;
     }
-    return function log() {
-        // Do nothing.
-    };
+    return noop;
 }());
 
-/******************************** Constants **********************************/
+/********************************* Constants **********************************/
 
 // Public
+/** @const */
 var PI2 = cog.PI2 = Math.PI * 2,
 
 // Private
     // Some properties may be overridden. Get the originals where possible.
+    /** @const */
     Object = ({}).constructor,
+    /** @const */
     hasOwnProperty = Object.prototype.hasOwnProperty,
+    /** @const */
     isNaN = global.isNaN;
 
-/****************************** Polyfills/Shims ******************************/
+/****************************** Polyfills/Shims *******************************/
 
 /*
  * Internet Explorer 8 and earlier versions do not support the <canvas>
@@ -163,7 +173,7 @@ var PI2 = cog.PI2 = Math.PI * 2,
     }
 }(global));
 
-/******************************* Basic Objects *******************************/
+/******************************* Basic Objects ********************************/
 
 /**
  * A 2D generic object with x and y coordinates.
@@ -276,6 +286,7 @@ Object_.prototype.moveToY = function(y) {
  * @return {cog.Object} this
  */
 Object_.prototype.draw = function(painter) {
+    /*jshint unused:vars */
     return this;
 };
 
@@ -354,9 +365,7 @@ Shape.prototype.toString = function() {
  * @param {cog.Shape} shape - The shape to detect collision with.
  * @return {boolean} Always returns false.
  */
-Shape.prototype.intersectsBBof = function(shape) {
-    return false;
-};
+Shape.prototype.intersectsBBof = returnFalse;
 
 /**
  * Checks if the axis-aligned minimum bounding rectangle of the shape collides
@@ -367,9 +376,7 @@ Shape.prototype.intersectsBBof = function(shape) {
  * @param {cog.Shape} shape - The shape to detect collision with.
  * @return {boolean} Always returns false.
  */
-Shape.prototype.intersects = function(shape) {
-    return false;
-};
+Shape.prototype.intersects = returnFalse;
 
 /**
  * Checks if the axis-aligned minimum bounding rectangle of the first shape
@@ -450,6 +457,7 @@ Circle.prototype.intersectsBBof = function(shape) {
  * @return {boolean} true if the two shapes collide.
  */
 Circle.prototype.intersects = function(shape) {
+    // TODO: Finish it.
     return false;
 };
 
@@ -513,6 +521,7 @@ Rect.prototype.intersectsBBof = function(shape) {
  * @return {boolean} true if the two shapes collide.
  */
 Rect.prototype.intersects = function(shape) {
+    // TODO: Finish it.
     return false;
 };
 
@@ -622,7 +631,7 @@ Text.prototype.draw = function(painter) {
 
 cog.Text = Text;
 
-/****************************** Drawing Classes ******************************/
+/****************************** Drawing Classes *******************************/
 
 /*
  * Canvas performance tips:
@@ -747,7 +756,7 @@ Painter.prototype.getTextWidth = function(text) {
 
 cog.Painter = Painter;
 
-/******************************** User Input *********************************/
+/********************************* User Input *********************************/
 
 /**
  * A daemon that captures user input.
@@ -755,8 +764,8 @@ cog.Painter = Painter;
  * @constructor
  */
 function UserInputDaemon() {
-    this.events = {};
-    this.targets = {};
+    /** @const */
+    this._events = {};
 }
 
 /**
@@ -781,7 +790,7 @@ UserInputDaemon.prototype.on = function(events, handler) {
     events = events.split(' ');
     for (i = 0, len = events.length; i < len; ++i) {
         event = events[i];
-        list = this.events[event];
+        list = this._events[event];
 
         try {
             if (list.indexOf(handler) >= 0) {
@@ -790,7 +799,7 @@ UserInputDaemon.prototype.on = function(events, handler) {
         } catch (ex) {
             switch (ex.name) {
             case 'TypeError':   // No handler list yet.
-                this.events[event] = [handler];
+                this._events[event] = [handler];
                 break;
             default:
                 throw new Error('Assertion failed');
@@ -817,10 +826,10 @@ UserInputDaemon.prototype.off = function(events, handler) {
         event = events[i];
 
         if (handler) {
-            list = this.events[event];
+            list = this._events[event];
             list.splice(list.indexOf(handler), 1);
         } else {
-            delete this.events[event];
+            delete this._events[event];
         }
     }
     return this;
@@ -836,7 +845,7 @@ UserInputDaemon.prototype.off = function(events, handler) {
  * @return {cog.UserInputDaemon} this
  */
 UserInputDaemon.prototype.trigger = function(event, data) {
-    var i, len, list = this.events[event];
+    var i, len, list = this._events[event];
 
     if (list) {
         for (i = 0, len = list.length; i < len; ++i) {
@@ -879,7 +888,7 @@ UserInputDaemon.prototype.restart = function() {
 
 cog.UserInputDaemon = UserInputDaemon;
 
-/******************************* Local Storage *******************************/
+/******************************* Local Storage ********************************/
 
 /*
  * https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Storage
@@ -1129,7 +1138,7 @@ GameStorageManager.prototype.resetTimesPlayed = function() {
 
 cog.GameStorageManager = GameStorageManager;
 
-/***************************** Application Cache *****************************/
+/***************************** Application Cache ******************************/
 
 /*
  * http://www.html5rocks.com/en/tutorials/appcache/beginner/
@@ -1184,7 +1193,7 @@ AppCacheManager.prototype.update = function() {
 
 cog.AppCacheManager = AppCacheManager;
 
-/********************************* Utilities *********************************/
+/********************************* Utilities **********************************/
 
 /**
  * Gives control of the "cog" variable back to its previous owner.
@@ -1196,6 +1205,12 @@ cog.noConflict = function() {
     }
     return cog;
 };
+
+/**
+ * A function that does nothing.
+ * You can use this when you wish to pass around an empty function.
+ */
+cog.noop = noop;
 
 
 // Expose cog.
