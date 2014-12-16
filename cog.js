@@ -812,14 +812,24 @@ UserInputDaemon.prototype.on = function(events, handler) {
 /**
  * Removes an event handler.
  *
- * @param {string} events - One or more space-separated event types.
- * @param {function} [handler] - The handler (previously attached) to remove.
- *      If a handler is not specified, then all events handlers of that type
- *      are removed.
+ * @param {string} [events] - One or more space-separated event types.
+ *      If an event is not specified, then all handlers (for any event type
+ *          registered) are removed.
+ * @param {function} [handler] - The handler (previously registered) to remove.
+ *      If a handler is not specified, then all handlers for the event type
+ *          specified are removed.
  * @return {cog.UserInputDaemon} this
  */
 UserInputDaemon.prototype.off = function(events, handler) {
+    /*jshint forin: false */
     var i, len, event, list;
+
+    if (!events) {
+        for (event in this._events) {
+            delete this._events[event];
+        }
+        return;
+    }
 
     events = events.split(' ');
     for (i = 0, len = events.length; i < len; ++i) {
