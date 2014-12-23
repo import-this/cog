@@ -760,6 +760,7 @@ cog.Painter = Painter;
 
 /**
  * A daemon that captures user input.
+ * The daemon deals with custom events only.
  * Subclass this to provide application specific functionality.
  * @constructor
  */
@@ -793,7 +794,7 @@ UserInputDaemon.prototype.on = function(events, handler) {
         list = this._events[event];
 
         try {
-            if (list.indexOf(handler) >= 0) {
+            if (list.indexOf(handler) === -1) {
                 list.push(handler);
             }
         } catch (ex) {
