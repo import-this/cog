@@ -751,7 +751,8 @@ Painter.prototype.drawText = function(text) {
  * @return {number} The width of the text.
  */
 Painter.prototype.getTextWidth = function(text) {
-    return this.ctx.measureText(text).width;
+    this.applyOptions(text.options);
+    return this.ctx.measureText(text.text).width;
 };
 
 cog.Painter = Painter;
