@@ -654,7 +654,7 @@ function Painter(canvas) {
  * Applies the options specified to the canvas context.
  * @param {Object} options - A configuration object.
  */
-Painter.prototype._applyOptions = function(options) {
+Painter.prototype.applyOptions = function(options) {
     var ctx = this.ctx, prop;
 
     for (prop in options) {
@@ -704,7 +704,7 @@ Painter.prototype.clearRect = function(rect) {
  * @return {cog.Painter} this
  */
 Painter.prototype.drawRect = function(rect) {
-    this._applyOptions(rect.options);
+    this.applyOptions(rect.options);
     this.ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
     return this;
 };
@@ -727,7 +727,7 @@ Painter.prototype.drawSquare = function(square) {
 Painter.prototype.drawCircle = function(circle) {
     var ctx = this.ctx;
 
-    this._applyOptions(circle.options);
+    this.applyOptions(circle.options);
     ctx.beginPath();
     ctx.arc(circle.x, circle.y, circle.radius, 0, PI2);
     ctx.fill();
@@ -740,7 +740,7 @@ Painter.prototype.drawCircle = function(circle) {
  * @return {cog.Painter} this
  */
 Painter.prototype.drawText = function(text) {
-    this._applyOptions(text.options);
+    this.applyOptions(text.options);
     this.ctx.fillText(text.text, text.x, text.y);
     return this;
 };
