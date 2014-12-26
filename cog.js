@@ -794,18 +794,13 @@ UserInputDaemon.prototype.on = function(events, handler) {
         event = events[i];
         list = this._events[event];
 
-        try {
+        if (list) {
             if (list.indexOf(handler) === -1) {
                 list.push(handler);
             }
-        } catch (ex) {
-            switch (ex.name) {
-            case 'TypeError':   // No handler list yet.
-                this._events[event] = [handler];
-                break;
-            default:
-                throw new Error('Assertion failed');
-            }
+        } else {
+            // No handler list yet.
+            this._events[event] = [handler];
         }
     }
     return this;
