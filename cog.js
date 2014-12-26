@@ -645,9 +645,9 @@ cog.Text = Text;
  * @constructor
  */
 function Painter(canvas) {
-    this.ctx = canvas.getContext('2d');
     this.width = canvas.width;
     this.height = canvas.height;
+    this._ctx = canvas.getContext('2d');
 }
 
 /**
@@ -655,7 +655,7 @@ function Painter(canvas) {
  * @param {Object} options - A configuration object.
  */
 Painter.prototype.applyOptions = function(options) {
-    var ctx = this.ctx, prop;
+    var ctx = this._ctx, prop;
 
     for (prop in options) {
         if (hasOwnProperty.call(options, prop)) {
@@ -668,7 +668,7 @@ Painter.prototype.applyOptions = function(options) {
  * Displays the canvas of the painter.
  */
 Painter.prototype.showCanvas = function() {
-    this.ctx.canvas.style.display = 'block';
+    this._ctx.canvas.style.display = 'block';
 };
 
 /**
@@ -676,7 +676,7 @@ Painter.prototype.showCanvas = function() {
  * After this call, the canvas will not occupy any space.
  */
 Painter.prototype.hideCanvas = function() {
-    this.ctx.canvas.style.display = 'none';
+    this._ctx.canvas.style.display = 'none';
 };
 
 /**
@@ -684,7 +684,7 @@ Painter.prototype.hideCanvas = function() {
  * @return {cog.Painter} this
  */
 Painter.prototype.clear = function() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
+    this._ctx.clearRect(0, 0, this.width, this.height);
     return this;
 };
 
@@ -694,7 +694,7 @@ Painter.prototype.clear = function() {
  * @return {cog.Painter} this
  */
 Painter.prototype.clearRect = function(rect) {
-    this.ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
+    this._ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
     return this;
 };
 
@@ -705,7 +705,7 @@ Painter.prototype.clearRect = function(rect) {
  */
 Painter.prototype.drawRect = function(rect) {
     this.applyOptions(rect.options);
-    this.ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    this._ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
     return this;
 };
 
@@ -725,7 +725,7 @@ Painter.prototype.drawSquare = function(square) {
  * @return {cog.Painter} this
  */
 Painter.prototype.drawCircle = function(circle) {
-    var ctx = this.ctx;
+    var ctx = this._ctx;
 
     this.applyOptions(circle.options);
     ctx.beginPath();
@@ -741,7 +741,7 @@ Painter.prototype.drawCircle = function(circle) {
  */
 Painter.prototype.drawText = function(text) {
     this.applyOptions(text.options);
-    this.ctx.fillText(text.text, text.x, text.y);
+    this._ctx.fillText(text.text, text.x, text.y);
     return this;
 };
 
@@ -752,7 +752,7 @@ Painter.prototype.drawText = function(text) {
  */
 Painter.prototype.getTextWidth = function(text) {
     this.applyOptions(text.options);
-    return this.ctx.measureText(text.text).width;
+    return this._ctx.measureText(text.text).width;
 };
 
 cog.Painter = Painter;
