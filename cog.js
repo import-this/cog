@@ -181,35 +181,15 @@ var PI2 = cog.PI2 = Math.PI * 2,
  * Used as an abstract base class.
  *
  * @alias Object
- * @param {Object} options - A configuration object.
- *      The x and y coordinates default to 0.
+ * @param {number} [x=0] - The x-coordinate.
+ * @param {number} [y=0] - The y-coordinate.
  * @constructor
  */
 // Use an underscore to avoid collision with global.Object.
-function Object_(options) {
-    this.x = options.x || 0;
-    this.y = options.y || 0;
-    this.options = {};
-    this._copyOptions(options);
-    delete this.options.x;
-    delete this.options.y;
+function Object_(x, y) {
+    this.x = x || 0;
+    this.y = y || 0;
 }
-
-/**
- * Copies the options given to this.options.
- * @param {Object} options - A configuration object.
- */
-Object_.prototype._copyOptions = function(options) {
-    // http://stackoverflow.com/a/5344074/1751037
-    // No deep copies needed. A simple for in loop sufficies.
-    var target = this.options, prop;
-
-    for (prop in options) {
-        if (hasOwnProperty.call(options, prop)) {
-            target[prop] = options[prop];
-        }
-    }
-};
 
 Object_.prototype.toString = function() {
     return 'cog.Object = ' + JSON.stringify(this);
@@ -298,13 +278,13 @@ cog.Object = Object_;
  * A generic shape with x and y coordinates.
  * Root of all shapes.
  *
- * @param {Object} [options={}] - A configuration object.
- *      The x and y coordinates default to 0.
+ * @param {number} [x=0] - The x-coordinate.
+ * @param {number} [y=0] - The y-coordinate.
  * @constructor
  * @augments cog.Object
  */
-function Shape(options) {
-    Object_.call(this, options);
+function Shape(x, y) {
+    Object_.call(this, x, y);
 }
 
 Shape.prototype = Object.create(Object_.prototype);
@@ -406,16 +386,15 @@ cog.Shape = Shape;
 
 /**
  * A circle centered at (x, y).
- * @param {Object} [options={}] - A configuration object.
- *      The x and y coordinates and radius default to 0.
+ * @param {number} [x=0] - The x-coordinate.
+ * @param {number} [y=0] - The y-coordinate.
+ * @param {number} [radius=0] - The radius of the circle.
  * @constructor
  * @augments cog.Shape
  */
-function Circle(options) {
-    options = options || {};
-    Shape.call(this, options);
-    this.radius = options.radius || 0;
-    delete this.options.radius;
+function Circle(x, y, radius) {
+    Shape.call(this, x, y);
+    this.radius = radius || 0;
 }
 
 Circle.prototype = Object.create(Shape.prototype);
@@ -475,18 +454,17 @@ cog.Circle = Circle;
 
 /**
  * A rectangle with its top-left corner at (x, y).
- * @param {Object} [options={}] - A configuration object.
- *      The x, y coordinates and width, height parameters default to 0.
+ * @param {number} [x=0] - The x-coordinate.
+ * @param {number} [y=0] - The y-coordinate.
+ * @param {number} [width=0] - The width of the rectangle.
+ * @param {number} [height=0] - The height of the rectangle.
  * @constructor
  * @augments cog.Shape
  */
-function Rect(options) {
-    options = options || {};
-    Shape.call(this, options);
-    this.width = options.width || 0;
-    this.height = options.height || 0;
-    delete this.options.width;
-    delete this.options.height;
+function Rect(x, y, width, height) {
+    Shape.call(this, x, y);
+    this.width = width || 0;
+    this.height = height || 0;
 }
 
 Rect.prototype = Object.create(Shape.prototype);
@@ -539,22 +517,21 @@ cog.Rect = Rect;
 
 /**
  * A square with its top-left corner at (x, y).
- *
- * No need to make Square a subclass of Rectangle, so avoid the
- * square-rectangle problem (or circle-ellipse problem) altogether.
- *
- * @param {Object} [options={}] - A configuration object.
- *      The x, y coordinates and width, height parameters default to 0.
+ * @param {number} [x=0] - The x-coordinate.
+ * @param {number} [y=0] - The y-coordinate.
+ * @param {number} [width=0] - The width of the square.
  * @constructor
  * @augments cog.Shape
  */
-function Square(options) {
-    options = options || {};
-    Shape.call(this, options);
-    this.width = options.width || 0;
-    delete this.options.width;
+function Square(x, y, width) {
+    Shape.call(this, x, y);
+    this.width = width || 0;
 }
 
+/*
+ * No need to make Square a subclass of Rectangle, so avoid the
+ * square-rectangle problem (or circle-ellipse problem) altogether.
+ */
 Square.prototype = Object.create(Shape.prototype);
 Square.prototype.constructor = Square;
 
@@ -604,17 +581,15 @@ cog.Square = Square;
 
 /**
  * Text positioned at (x, y).
- * @param {Object} [options={}] - A configuration object.
- *      The x and y coordinates default to 0.
- *      The text defaults to an empty string.
+ * @param {number} [x=0] - The x-coordinate.
+ * @param {number} [y=0] - The y-coordinate.
+ * @param {string} [text=''] - The actual text string.
  * @constructor
  * @augments cog.Object
  */
-function Text(options) {
-    options = options || {};
-    Object_.call(this, options);
-    this.text = options.text || '';
-    delete this.options.text;
+function Text(x, y, text) {
+    Object_.call(this, x, y);
+    this.text = text || '';
 }
 
 Text.prototype = Object.create(Object_.prototype);
@@ -651,10 +626,22 @@ function Painter(canvas) {
 }
 
 /**
+ * Applies the option specified to the canvas context.
+ * @param {string} option - The option to set.
+ * @param {Object} value - The value to set the option to.
+ * @return {cog.Painter} this
+ */
+Painter.prototype.setOption = function(option, value) {
+    this._ctx[option] = value;
+    return this;
+};
+
+/**
  * Applies the options specified to the canvas context.
  * @param {Object} options - A configuration object.
+ * @return {cog.Painter} this
  */
-Painter.prototype.applyOptions = function(options) {
+Painter.prototype.setOptions = function(options) {
     var ctx = this._ctx, prop;
 
     for (prop in options) {
@@ -662,21 +649,26 @@ Painter.prototype.applyOptions = function(options) {
             ctx[prop] = options[prop];
         }
     }
+    return this;
 };
 
 /**
  * Displays the canvas of the painter.
+ * @return {cog.Painter} this
  */
 Painter.prototype.showCanvas = function() {
     this._ctx.canvas.style.display = 'block';
+    return this;
 };
 
 /**
  * Hides the canvas of the painter.
  * After this call, the canvas will not occupy any space.
+ * @return {cog.Painter} this
  */
 Painter.prototype.hideCanvas = function() {
     this._ctx.canvas.style.display = 'none';
+    return this;
 };
 
 /**
@@ -704,7 +696,6 @@ Painter.prototype.clearRect = function(rect) {
  * @return {cog.Painter} this
  */
 Painter.prototype.drawRect = function(rect) {
-    this.applyOptions(rect.options);
     this._ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
     return this;
 };
@@ -727,7 +718,6 @@ Painter.prototype.drawSquare = function(square) {
 Painter.prototype.drawCircle = function(circle) {
     var ctx = this._ctx;
 
-    this.applyOptions(circle.options);
     ctx.beginPath();
     ctx.arc(circle.x, circle.y, circle.radius, 0, PI2);
     ctx.fill();
@@ -740,7 +730,6 @@ Painter.prototype.drawCircle = function(circle) {
  * @return {cog.Painter} this
  */
 Painter.prototype.drawText = function(text) {
-    this.applyOptions(text.options);
     this._ctx.fillText(text.text, text.x, text.y);
     return this;
 };
@@ -751,7 +740,6 @@ Painter.prototype.drawText = function(text) {
  * @return {number} The width of the text.
  */
 Painter.prototype.getTextWidth = function(text) {
-    this.applyOptions(text.options);
     return this._ctx.measureText(text.text).width;
 };
 
