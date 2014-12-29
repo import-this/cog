@@ -7,10 +7,14 @@
  * https://github.com/import-this/cog/blob/master/LICENSE
  *
  * Cog is a tiny library inspired by other powerful 2D HTML5 canvas
- * JavaScript libraries like KineticJS, Fabric.js, Paper.js or EaselJS.
+ * JavaScript libraries like Fabric.js, KineticJS, EaselJS or Paper.js.
  * It is a toy project made out of the effort of trying to understand
- * the process of making an HTML5 game. In all likelihood, it will not
- * be developed any further in the future. No need to reinvent the wheel.
+ * the process of making an HTML5 game. Thus, it only supports the very
+ * basics (such as shapes, drawing or storage) and does not provide any
+ * advanced features such as stages, layers, filters or event detection.
+ * 
+ * In all likelihood, it will not be developed any further in the future.
+ * No need to reinvent the wheel when there is already so much great stuff.
  *
  * Fun fact:
  *      The library name Cog is derived from 'Cognitive science', an
@@ -58,7 +62,7 @@
  * Comments follow the conventions of JSDoc. Documentation can be found here:
  *      http://usejsdoc.org/
  *
- * Date: 15/10/2014
+ * Date: 29/12/2014
  * @version: 1.0.0
  * @author Vasilis Poulimenos
  */
@@ -260,9 +264,10 @@ Object_.prototype.moveToY = function(y) {
 };
 
 /**
- * This method does not draw anything.
+ * Draws the object with the painter specified.
+ * This method does not draw actually anything.
  * Subclasses may override this method for custom drawing.
- * @param {cog.Painter} painter -
+ * @param {cog.Painter} painter - The painter to use for drawing.
  * @return {cog.Object} this
  */
 Object_.prototype.draw = function(painter) {
@@ -441,7 +446,8 @@ Circle.prototype.intersects = function(shape) {
 };
 
 /**
- *
+ * Draws the circle with the painter specified.
+ * @param {cog.Painter} painter - The painter to use for drawing.
  * @return {cog.Circle} this
  */
 Circle.prototype.draw = function(painter) {
@@ -504,7 +510,8 @@ Rect.prototype.intersects = function(shape) {
 };
 
 /**
- *
+ * Draws the rectangle with the painter specified.
+ * @param {cog.Painter} painter - The painter to use for drawing.
  * @return {cog.Rect} this
  */
 Rect.prototype.draw = function(painter) {
@@ -568,7 +575,8 @@ Square.prototype.intersectsBBof = Rect.prototype.intersectsBBof;
 Square.prototype.intersects = Rect.prototype.intersects;
 
 /**
- *
+ * Draws the square with the painter specified.
+ * @param {cog.Painter} painter - The painter to use for drawing.
  * @return {cog.Square} this
  */
 Square.prototype.draw = function(painter) {
@@ -596,7 +604,8 @@ Text.prototype = Object.create(Object_.prototype);
 Text.prototype.constructor = Text;
 
 /**
- *
+ * Draws the text with the painter specified.
+ * @param {cog.Painter} painter - The painter to use for drawing.
  * @return {cog.Text} this
  */
 Text.prototype.draw = function(painter) {
