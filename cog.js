@@ -662,6 +662,32 @@ Painter.prototype.setOptions = function(options) {
 };
 
 /**
+ * Saves the current state of the context of the canvas.
+ * Use this method in conjunction with restoreContext() to set a bunch
+ * of options and undo them later on. The states are stored on a stack,
+ * so you can call this method multiple times in succession or interleave
+ * the calls arbitrarily with calls to restoreContext().
+ * @return {cog.Painter} this
+ */
+Painter.prototype.save = function() {
+    this._ctx.save();
+    return this;
+};
+
+/**
+ * Restores a previously saved state of the context of the canvas.
+ * Use this method to revert to a state that was saved earlier on
+ * with saveContext(). Since the states are stored on a stack, if
+ * this method is called multiple times in succession, the states
+ * are restored in a LIFO (Last In, First Out) fashion.
+ * @return {cog.Painter} this
+ */
+Painter.prototype.restore = function() {
+    this._ctx.restore();
+    return this;
+};
+
+/**
  * Displays the canvas of the painter.
  * @return {cog.Painter} this
  */
